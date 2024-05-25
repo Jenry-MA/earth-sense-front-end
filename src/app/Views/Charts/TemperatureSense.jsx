@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -23,7 +23,42 @@ ChartJS.register(
   Legend
 );
 
-export const TemperatureSense = () => {
+export const TemperatureSense = ({props}) => {
+
+
+  const [objStructure, setObjStructure] = useState({
+    labels: props.label,
+    datasets: [
+      {
+        label: "Temperature",
+        data: props.values,
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+      },
+    ],
+  });
+
+  const updateData = (labels, values) => {
+
+    setObjStructure({
+      labels: labels,
+      datasets: [
+        {
+          label: "Temperature",
+          data: values,
+          borderColor: "rgb(255, 99, 132)",
+          backgroundColor: "rgba(255, 99, 132, 0.5)",
+        }
+      ]
+    })
+  };
+
+  useEffect(() => {
+    
+    console.log("obj",props.label)
+    updateData(props.label,props.values)
+  },[props])
+
   const options = {
     responsive: true,
     plugins: {
@@ -32,41 +67,12 @@ export const TemperatureSense = () => {
       },
       title: {
         display: true,
-        text: "Chart.js Line Chart",
+        text: "Temperatura en Grados",
       },
     },
   };
 
-  const labels = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-  ];
+ 
 
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: "Dataset 1",
-        data: labels.map(() =>
-          faker.datatype.number({ min: -1000, max: 1000 })
-        ),
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-      },
-      {
-        label: "Dataset 2",
-        data: labels.map(() =>
-          faker.datatype.number({ min: -1000, max: 1000 })
-        ),
-        borderColor: "rgb(53, 162, 235)",
-        backgroundColor: "rgba(53, 162, 235, 0.5)",
-      },
-    ],
-  };
-  return <Line options={options} data={data} />;
+  return <Line options={options} data={objStructure} />;
 };

@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from "react";
+import dayjs from 'dayjs';
 import { H2oSense } from "./Charts/H2oSense";
 import { TemperatureSense } from "./Charts/TemperatureSense";
 import { TemperatureSense as TemperatureSenseApi } from "../Helpers/Api";
@@ -8,6 +9,8 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { DatePickerTheme } from "../Helpers/Config";
 import { ThemeProvider } from '@mui/material/styles';
 import { Search } from 'lucide-react';
+import { SnackbarProvider, enqueueSnackbar } from 'notistack';
+import dateFns from "date-fns"
 
 export const Main = () => {
 
@@ -15,49 +18,127 @@ export const Main = () => {
    const { datePickerLightTheme } = DatePickerTheme
 
    const [data, setData] = useState([]);
-   const [selectedFromDate, setSelectedFromDate] = useState(null);
-   const [selectedToDate, setSelectedToDate] = useState(null);
+   const [selectedDate, setSelectedDate] = useState(null);
+   const [viewData, setViewDate] = useState(new Date())
+   const [validateDates, setValidateDates] = useState({
+    validateFrom: false, 
+    validateTo: false
+   })
+
+
+   /**
+    * first fetch on load page
+    */
+  const onLoad = async () => {
+    try{
+    //create obj date
+      const dateObj = new Date()
+      
+      
+      //create unix format
+      const unixTimestamp = Math.floor(dateObj.getTime() / 1000)
+
+      setSelectedDate(unixTimestamp)
+
+      const dates = getUnixTimestampsOfDay(unixTimestamp)
+
+      console.log(dates)
+   
+      const response = await getTemperatureSensorIndex(dates.startOfDay, dates.endOfDay)
+
+      setData(response)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   useEffect(() => {
-    getTemperatureSensorIndex("1715825829","1715827029")
-    .then((response) => {
-      console.log(response)
-      setData(response)
-    })
-    .catch((error) => {
-      alert(error)
-    })
+    onLoad()
   },[])
 
-  const handleFromDate = (date) => {
-    const dateObj = new Date(date)
-    const unixTimestamp = Math.floor(dateObj.getTime() / 1000)
-    setSelectedFromDate(unixTimestamp)
+  /**
+   * validate if date is diff to null, 0 or Nan
+   * @param {BigInteger|Nan|null} value 
+   * @returns {boolean}
+   */
+  const isValid = (value) => {
+    return value !== null && value !== 0 && !isNaN(value);
   }
 
+  /**
+   * get value date
+   * @param {string} date 
+   */
   const handleToDate = (date) => {
+    
+    setViewDate(date)
+
+    //create obj date
     const dateObj = new Date(date)
+
+    //create unix format
     const unixTimestamp = Math.floor(dateObj.getTime() / 1000)
-    setSelectedToDate(unixTimestamp)
+    setSelectedDate(unixTimestamp)
+    setValidateDates({
+      ...validateDates,
+      validateTo: isValid(date),
+    })
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
+
+    if(!validateDates.validateTo) { 
+      enqueueSnackbar('Please check fill', { variant: 'error' })
+      return
+    }
+
+    const dates = getUnixTimestampsOfDay(selectedDate)
+    try{
+      const response = await getTemperatureSensorIndex(dates.startOfDay, dates.endOfDay)
+      console.log(response)
+      setData(response)
+      enqueueSnackbar('Data fetched', { variant: 'success' })
+    }catch(error){
+      console.log(error)
+      enqueueSnackbar('Data fetched', { variant: 'error' })
+    }
+  }
+
+  function getUnixTimestampsOfDay(unixTimestamp) {
+
+    const startDate = new Date(unixTimestamp * 1000); // Convert UNIX timestamp to milliseconds
+  const startOfDay = new Date(startDate); // Copy the original date
+  const endOfDay = new Date(startDate); // Copy the original date
+
+  // Set start time to 00:00:00
+  startOfDay.setUTCHours(0, 0, 0, 0);
+
+  // Set end time to 23:59:59
+  endOfDay.setUTCHours(23, 59, 59, 999);
+
+  return {
+    startOfDay: Math.floor(startOfDay.getTime() / 1000), // Convert back to UNIX timestamp (in seconds)
+    endOfDay: Math.floor(endOfDay.getTime() / 1000) // Convert back to UNIX timestamp (in seconds)
+  };
   }
 
   return (
     <div className="container mx-auto">
-      <form className="flex flex-row gap-2 items-center">
-        <ThemeProvider theme={datePickerLightTheme}>
-          <DemoContainer components={['DatePicker']}>
-            <DatePicker onChange={handleFromDate} label="From" />
-          </DemoContainer>
-        </ThemeProvider>
-        <ThemeProvider theme={datePickerLightTheme}>
-          <DemoContainer components={['DatePicker']}>
-            <DatePicker onChange={handleToDate} label="To" />
-          </DemoContainer>
-        </ThemeProvider>
+      <SnackbarProvider/>
+      <form className="flex flex-row gap-2 mt-2 items-center">
+        <div className="flex flex-col gap-1">
+          <ThemeProvider theme={datePickerLightTheme}>
+            <DemoContainer components={['DatePicker']}>
+              <DatePicker 
+                onChange={handleToDate} 
+                label="Date" 
+                value={viewData}
+                disableFuture
+              />
+            </DemoContainer>
+          </ThemeProvider>          
+        </div>
         <button 
           type="button" 
           title="search" 
@@ -67,12 +148,12 @@ export const Main = () => {
           <Search />
         </button>
       </form>
-      <div className="grid md:grid-cols-2 grid-cols-1 gap-2 py-4">
+     <div className="grid md:grid-cols-2 grid-cols-1 gap-2 py-4">
         <div className="p-2 bg-white rounded-lg">
           <H2oSense />
         </div>
         <div className="p-2 bg-white rounded-lg">
-          <TemperatureSense />
+          <TemperatureSense props={data} />
         </div>
       </div>
     </div>
