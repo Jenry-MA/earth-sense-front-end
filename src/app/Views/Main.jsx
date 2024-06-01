@@ -10,7 +10,7 @@ import { DatePickerTheme } from "../Helpers/Config";
 import { ThemeProvider } from '@mui/material/styles';
 import { Search } from 'lucide-react';
 import { SnackbarProvider, enqueueSnackbar } from 'notistack';
-import dateFns from "date-fns"
+import { CurrentTemperature} from "./Components/CurrentTemperature"
 
 export const Main = () => {
 
@@ -148,10 +148,8 @@ export const Main = () => {
           <Search />
         </button>
       </form>
-     <div className="grid md:grid-cols-2 grid-cols-1 gap-2 py-4">
-        <div className="p-2 bg-white rounded-lg">
-          <H2oSense />
-        </div>
+    <CurrentTemperature />
+     <div className="grid md:grid-cols-1 grid-cols-1 gap-2 py-4">
         <div className="p-2 bg-white rounded-lg">
           <TemperatureSense props={data} />
         </div>

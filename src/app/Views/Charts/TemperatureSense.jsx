@@ -11,7 +11,6 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import faker from "faker";
 
 ChartJS.register(
   CategoryScale,
@@ -30,7 +29,7 @@ export const TemperatureSense = ({props}) => {
     labels: props.label,
     datasets: [
       {
-        label: "Temperature",
+        label: "Temperatura",
         data: props.values,
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
@@ -44,7 +43,7 @@ export const TemperatureSense = ({props}) => {
       labels: labels,
       datasets: [
         {
-          label: "Temperature",
+          label: "Temperatura",
           data: values,
           borderColor: "rgb(255, 99, 132)",
           backgroundColor: "rgba(255, 99, 132, 0.5)",
@@ -70,6 +69,15 @@ export const TemperatureSense = ({props}) => {
         text: "Temperatura en Grados",
       },
     },
+    scales: {
+      y: {
+        ticks: {
+          callback: function (value) {
+            return value + "°"; // Add the degree symbol
+          },
+        },
+      },
+    }
   };
 
  
