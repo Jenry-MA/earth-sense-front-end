@@ -1,6 +1,5 @@
 "use client"
 import { useEffect, useState } from "react";
-import dayjs from 'dayjs';
 import { H2oSense } from "./Charts/H2oSense";
 import { TemperatureSense } from "./Charts/TemperatureSense";
 import { TemperatureSense as TemperatureSenseApi } from "../Helpers/Api";
@@ -25,7 +24,6 @@ export const Main = () => {
     validateTo: false
    })
 
-
    /**
     * first fetch on load page
     */
@@ -42,7 +40,7 @@ export const Main = () => {
       const dates = getUnixTimestampsOfDay(unixTimestamp)
    
       const response = await getTemperatureSensorIndex(dates.startOfDay, dates.endOfDay)
-
+      setData(response)
     } catch (error) {
       console.log(error)
     }
@@ -79,8 +77,6 @@ export const Main = () => {
 
     // Adjust the UTC time by the GMT-6 offset
     const gmtMinus6TimestampInSeconds = utcTimestampInSeconds + gmtMinus6OffsetInSeconds;
-
-
 
     setSelectedDate(gmtMinus6TimestampInSeconds)
     setValidateDates({

@@ -19,3 +19,18 @@ export const getTemperatureSensorIndex = async (start, end) => {
       throw error; // Re-throw the error to be handled by the calling function
     }
   };
+
+export const getCurrentTemperature = async () => {
+  try{
+    const url = new URL(`${API_DOMAIN}api/temperature-sensor/current-temperature`);
+    
+    const response = await fetch(url, { headers });
+    
+    const data = await response.json();
+    
+    return data;
+  } catch (error) {
+    console.error("Error fetching temperature sensor index:", error);
+    throw error; // Re-throw the error to be handled by the calling function
+  }
+}

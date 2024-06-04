@@ -30,21 +30,22 @@ export const TemperatureSense = ({props}) => {
     datasets: [
       {
         label: "Temperatura",
-        data: props.values,
+        data: props.temperature_c,
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
+        yAxisID: 'y1',
       },
-    ],
+    ]
   });
 
-  const updateData = (labels, values) => {
+  const updateData = (data) => {
 
     setObjStructure({
-      labels: labels,
+      labels: data.label,
       datasets: [
         {
-          label: "Temperatura",
-          data: values,
+          label: "Temperatura (°C)",
+          data: data.temperature_c,
           borderColor: "rgb(255, 99, 132)",
           backgroundColor: "rgba(255, 99, 132, 0.5)",
         }
@@ -53,9 +54,7 @@ export const TemperatureSense = ({props}) => {
   };
 
   useEffect(() => {
-    
-    console.log("obj",props.label)
-    updateData(props.label,props.values)
+    updateData(props)
   },[props])
 
   const options = {
@@ -65,7 +64,7 @@ export const TemperatureSense = ({props}) => {
         position: "top",
       },
       title: {
-        display: true,
+        display: false,
         text: "Temperatura en Grados",
       },
     },
