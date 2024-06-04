@@ -31,9 +31,8 @@ export const Main = () => {
     */
   const onLoad = async () => {
     try{
-    //create obj date
+      //create obj date
       const dateObj = new Date()
-      
       
       //create unix format
       const unixTimestamp = Math.floor(dateObj.getTime() / 1000)
@@ -41,12 +40,9 @@ export const Main = () => {
       setSelectedDate(unixTimestamp)
 
       const dates = getUnixTimestampsOfDay(unixTimestamp)
-
-      console.log(dates)
    
       const response = await getTemperatureSensorIndex(dates.startOfDay, dates.endOfDay)
 
-      setData(response)
     } catch (error) {
       console.log(error)
     }
@@ -77,8 +73,16 @@ export const Main = () => {
     const dateObj = new Date(date)
 
     //create unix format
-    const unixTimestamp = Math.floor(dateObj.getTime() / 1000)
-    setSelectedDate(unixTimestamp)
+    const utcTimestampInSeconds  = Math.floor(dateObj.getTime() / 1000)
+    // Define the timezone offset for GMT-6 in seconds
+    const gmtMinus6OffsetInSeconds = -6 * 60 * 60;
+
+    // Adjust the UTC time by the GMT-6 offset
+    const gmtMinus6TimestampInSeconds = utcTimestampInSeconds + gmtMinus6OffsetInSeconds;
+
+
+
+    setSelectedDate(gmtMinus6TimestampInSeconds)
     setValidateDates({
       ...validateDates,
       validateTo: isValid(date),
@@ -92,8 +96,9 @@ export const Main = () => {
       enqueueSnackbar('Please check fill', { variant: 'error' })
       return
     }
-
+    console.log(selectedDate)
     const dates = getUnixTimestampsOfDay(selectedDate)
+    console.log(dates)
     try{
       const response = await getTemperatureSensorIndex(dates.startOfDay, dates.endOfDay)
       console.log(response)
@@ -108,19 +113,19 @@ export const Main = () => {
   function getUnixTimestampsOfDay(unixTimestamp) {
 
     const startDate = new Date(unixTimestamp * 1000); // Convert UNIX timestamp to milliseconds
-  const startOfDay = new Date(startDate); // Copy the original date
-  const endOfDay = new Date(startDate); // Copy the original date
+    const startOfDay = new Date(startDate); // Copy the original date
+    const endOfDay = new Date(startDate); // Copy the original date
 
-  // Set start time to 00:00:00
-  startOfDay.setUTCHours(0, 0, 0, 0);
+    // Set start time to 00:00:00
+    startOfDay.setUTCHours(0, 0, 0, 0);
 
-  // Set end time to 23:59:59
-  endOfDay.setUTCHours(23, 59, 59, 999);
+    // Set end time to 23:59:59
+    endOfDay.setUTCHours(23, 59, 59, 999);
 
-  return {
-    startOfDay: Math.floor(startOfDay.getTime() / 1000), // Convert back to UNIX timestamp (in seconds)
-    endOfDay: Math.floor(endOfDay.getTime() / 1000) // Convert back to UNIX timestamp (in seconds)
-  };
+    return {
+      startOfDay: Math.floor(startOfDay.getTime() / 1000), // Convert back to UNIX timestamp (in seconds)
+      endOfDay: Math.floor(endOfDay.getTime() / 1000) // Convert back to UNIX timestamp (in seconds)
+    };
   }
 
   return (
