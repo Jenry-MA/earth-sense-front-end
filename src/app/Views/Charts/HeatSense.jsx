@@ -30,8 +30,8 @@ export const HeatSense = ({props}) => {
       {
         label: "Indice de Calor",
         data: props.heat_index_c,
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        borderColor: "rgb(239, 148, 108)",
+        backgroundColor: "rgba(239, 148, 108, 0.5)",
       },
     ]
   });
@@ -44,8 +44,8 @@ export const HeatSense = ({props}) => {
         {
           label: "Indice de Calor",
           data: data.heat_index_c,
-          borderColor: "rgb(255, 99, 132)",
-          backgroundColor: "rgba(255, 99, 132, 0.5)",
+          borderColor: "rgb(239, 148, 108)",
+          backgroundColor: "rgba(239, 148, 108, 0.5)",
         }
       ]
     })

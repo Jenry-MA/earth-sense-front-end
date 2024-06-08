@@ -30,8 +30,8 @@ export const HumiditySense = ({props}) => {
       {
         label: "Humedad",
         data: props.humidity,
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        borderColor: "rgb(52, 123, 255)",
+        backgroundColor: "rgba(52, 123, 255, 0.5)",
       },
     ]
   });
@@ -44,8 +44,8 @@ export const HumiditySense = ({props}) => {
         {
           label: "Humedad",
           data: data.humidity,
-          borderColor: "rgb(255, 99, 132)",
-          backgroundColor: "rgba(255, 99, 132, 0.5)",
+          borderColor: "rgb(52, 123, 255)",
+          backgroundColor: "rgba(52, 123, 255, 0.5)",
         }
       ]
     })

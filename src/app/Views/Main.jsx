@@ -10,7 +10,7 @@ import { DatePickerTheme } from "../Helpers/Config";
 import { ThemeProvider } from '@mui/material/styles';
 import { Search, Loader } from 'lucide-react';
 import { SnackbarProvider, enqueueSnackbar } from 'notistack';
-import { CurrentTemperature} from "./Components/CurrentTemperature"
+import { BasicInformation } from "./Components/BasicInformation";
 
 export const Main = () => {
 
@@ -25,27 +25,33 @@ export const Main = () => {
     validateTo: false
    })
    const [isFiltering, setIsFiltering] = useState(false)
+   const [isLoading, setIsLoading] = useState(true)
 
    /**
     * first fetch on load page
     */
   const onLoad = async () => {
     try{
+      setIsLoading(true)
       //create obj date
       const dateObj = new Date()
+
+      const guatemalaDate = new Date(dateObj.toLocaleString("en-US", { timeZone: "America/Guatemala" }));
       
       //create unix format
-      const unixTimestamp = Math.floor(dateObj.getTime() / 1000)
+      const unixTimestamp = Math.floor(guatemalaDate.getTime() / 1000)
 
       setSelectedDate(unixTimestamp)
 
       const dates = getUnixTimestampsOfDay(unixTimestamp)
    
       const response = await getTemperatureSensorIndex(dates.startOfDay, dates.endOfDay)
-    
+    console.log(response)
       setData(response)
     } catch (error) {
       console.log(error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -71,17 +77,15 @@ export const Main = () => {
     setViewDate(date)
 
     //create obj date
+  
     const dateObj = new Date(date)
 
+    const guatemalaDate = new Date(dateObj.toLocaleString("en-US", { timeZone: "America/Guatemala" }));
+    
     //create unix format
-    const utcTimestampInSeconds  = Math.floor(dateObj.getTime() / 1000)
-    // Define the timezone offset for GMT-6 in seconds
-    const gmtMinus6OffsetInSeconds = -6 * 60 * 60;
+    const utcTimestampInSeconds  = Math.floor(guatemalaDate.getTime() / 1000)
 
-    // Adjust the UTC time by the GMT-6 offset
-    const gmtMinus6TimestampInSeconds = utcTimestampInSeconds + gmtMinus6OffsetInSeconds;
-
-    setSelectedDate(gmtMinus6TimestampInSeconds)
+    setSelectedDate(utcTimestampInSeconds)
     setValidateDates({
       ...validateDates,
       validateTo: isValid(date),
@@ -96,10 +100,12 @@ export const Main = () => {
       enqueueSnackbar('Please check fill', { variant: 'error' })
       return
     }
-    console.log(selectedDate)
+  
     const dates = getUnixTimestampsOfDay(selectedDate)
+    console.log(dates)
     try{
       const response = await getTemperatureSensorIndex(dates.startOfDay, dates.endOfDay)
+      console.log(response)
       setData(response)
       enqueueSnackbar('Data fetched', { variant: 'success' })
     }catch(error){
@@ -129,7 +135,7 @@ export const Main = () => {
   }
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto md:p-0 p-2">
       <SnackbarProvider/>
       <form className="flex flex-row gap-2 mt-2 items-center">
         <div className="flex flex-col gap-1">
@@ -165,16 +171,24 @@ export const Main = () => {
         }
         
       </form>
-    <CurrentTemperature />
      <div className="grid md:grid-cols-2 grid-cols-1 gap-2 py-4">
-        <div className="p-2 bg-white rounded-lg">
-          <TemperatureSense props={data} />
+        <div>
+          <BasicInformation/>
         </div>
         <div className="p-2 bg-white rounded-lg">
-          <HumiditySense props={data} />
+          {isLoading ?   <div className="md:h-72 h-32 flex flex-col justify-center items-center">
+             <Loader className="animate-spin md:w-20 md:h-20 h-10 w-10" />
+          </div> : <TemperatureSense props={data} />}
         </div>
         <div className="p-2 bg-white rounded-lg">
-          <HeatSense props={data} />
+          {isLoading ?   <div className="md:h-72 h-32 flex flex-col justify-center items-center">
+             <Loader className="animate-spin md:w-20 md:h-20 h-10 w-10" />
+          </div> : <HumiditySense props={data} />}
+        </div>
+        <div className="p-2 bg-white rounded-lg">
+          {isLoading ?   <div className="md:h-72 h-32 flex flex-col justify-center items-center">
+             <Loader className="animate-spin md:w-20 md:h-20 h-10 w-10" />
+          </div> : <HeatSense props={data} />}
         </div>
       </div>
     </div>
