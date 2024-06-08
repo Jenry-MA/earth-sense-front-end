@@ -22,15 +22,14 @@ ChartJS.register(
   Legend
 );
 
-export const TemperatureSense = ({props}) => {
-
+export const HumiditySense = ({props}) => {
 
   const [objStructure, setObjStructure] = useState({
     labels: props.label,
     datasets: [
       {
-        label: "Temperatura",
-        data: props.temperature_c,
+        label: "Humedad",
+        data: props.humidity,
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
@@ -43,8 +42,8 @@ export const TemperatureSense = ({props}) => {
       labels: data.label,
       datasets: [
         {
-          label: "Temperatura (°C)",
-          data: data.temperature_c,
+          label: "Humedad",
+          data: data.humidity,
           borderColor: "rgb(255, 99, 132)",
           backgroundColor: "rgba(255, 99, 132, 0.5)",
         }
@@ -64,14 +63,14 @@ export const TemperatureSense = ({props}) => {
       },
       title: {
         display: false,
-        text: "Temperatura en Grados",
+        text: "Humedad 💧",
       },
     },
     scales: {
       y: {
         ticks: {
           callback: function (value) {
-            return value + "°"; // Add the degree symbol
+            return value + "💧"; // Add the degree symbol
           },
         },
       },

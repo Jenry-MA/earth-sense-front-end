@@ -1,13 +1,14 @@
 "use client"
 import { useEffect, useState } from "react";
-import { H2oSense } from "./Charts/H2oSense";
 import { TemperatureSense } from "./Charts/TemperatureSense";
+import { HumiditySense } from "./Charts/HumiditySense";
+import { HeatSense } from "./Charts/HeatSense";
 import { TemperatureSense as TemperatureSenseApi } from "../Helpers/Api";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { DatePickerTheme } from "../Helpers/Config";
 import { ThemeProvider } from '@mui/material/styles';
-import { Search } from 'lucide-react';
+import { Search, Loader } from 'lucide-react';
 import { SnackbarProvider, enqueueSnackbar } from 'notistack';
 import { CurrentTemperature} from "./Components/CurrentTemperature"
 
@@ -23,6 +24,7 @@ export const Main = () => {
     validateFrom: false, 
     validateTo: false
    })
+   const [isFiltering, setIsFiltering] = useState(false)
 
    /**
     * first fetch on load page
@@ -40,6 +42,7 @@ export const Main = () => {
       const dates = getUnixTimestampsOfDay(unixTimestamp)
    
       const response = await getTemperatureSensorIndex(dates.startOfDay, dates.endOfDay)
+    
       setData(response)
     } catch (error) {
       console.log(error)
@@ -87,6 +90,7 @@ export const Main = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    setIsFiltering(true)
 
     if(!validateDates.validateTo) { 
       enqueueSnackbar('Please check fill', { variant: 'error' })
@@ -94,15 +98,15 @@ export const Main = () => {
     }
     console.log(selectedDate)
     const dates = getUnixTimestampsOfDay(selectedDate)
-    console.log(dates)
     try{
       const response = await getTemperatureSensorIndex(dates.startOfDay, dates.endOfDay)
-      console.log(response)
       setData(response)
       enqueueSnackbar('Data fetched', { variant: 'success' })
     }catch(error){
       console.log(error)
       enqueueSnackbar('Data fetched', { variant: 'error' })
+    } finally {
+      setIsFiltering(false)
     }
   }
 
@@ -140,19 +144,37 @@ export const Main = () => {
             </DemoContainer>
           </ThemeProvider>          
         </div>
-        <button 
+        {!isFiltering 
+        ? //if true
+          <button 
+            type="button" 
+            title="search" 
+            className="rounded bg-blue-500 hover:bg-blue-400 p-4 mt-2 cursor-pointer"
+            onClick={handleSubmit}
+          >
+            <Search />
+          </button> 
+        : //else
+          <button 
           type="button" 
-          title="search" 
+          title="filtering" 
           className="rounded bg-blue-500 hover:bg-blue-400 p-4 mt-2 cursor-pointer"
-          onClick={handleSubmit}
-        >
-          <Search />
-        </button>
+          >
+            <Loader className="animate-spin" />
+          </button>
+        }
+        
       </form>
     <CurrentTemperature />
-     <div className="grid md:grid-cols-1 grid-cols-1 gap-2 py-4">
+     <div className="grid md:grid-cols-2 grid-cols-1 gap-2 py-4">
         <div className="p-2 bg-white rounded-lg">
           <TemperatureSense props={data} />
+        </div>
+        <div className="p-2 bg-white rounded-lg">
+          <HumiditySense props={data} />
+        </div>
+        <div className="p-2 bg-white rounded-lg">
+          <HeatSense props={data} />
         </div>
       </div>
     </div>

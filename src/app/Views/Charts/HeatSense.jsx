@@ -22,15 +22,14 @@ ChartJS.register(
   Legend
 );
 
-export const TemperatureSense = ({props}) => {
-
+export const HeatSense = ({props}) => {
 
   const [objStructure, setObjStructure] = useState({
     labels: props.label,
     datasets: [
       {
-        label: "Temperatura",
-        data: props.temperature_c,
+        label: "Indice de Calor",
+        data: props.heat_index_c,
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
@@ -43,8 +42,8 @@ export const TemperatureSense = ({props}) => {
       labels: data.label,
       datasets: [
         {
-          label: "Temperatura (°C)",
-          data: data.temperature_c,
+          label: "Indice de Calor",
+          data: data.heat_index_c,
           borderColor: "rgb(255, 99, 132)",
           backgroundColor: "rgba(255, 99, 132, 0.5)",
         }
@@ -64,7 +63,7 @@ export const TemperatureSense = ({props}) => {
       },
       title: {
         display: false,
-        text: "Temperatura en Grados",
+        text: "Indice de Calor",
       },
     },
     scales: {
