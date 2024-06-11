@@ -44,6 +44,7 @@ export const Main = () => {
       setSelectedDate(unixTimestamp)
 
       const dates = getUnixTimestampsOfDay(unixTimestamp)
+      console.log(dates)
    
       const response = await getTemperatureSensorIndex(dates.startOfDay, dates.endOfDay)
     console.log(response)
